@@ -14,8 +14,9 @@ express()
     const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
     await page.setViewport({ width: 600, height: 800 });
-    await page.goto(process.env.SCREENSHOT_URL || 'https://www.wunderground.com/weather/us/vt/dorset',
-    timeout: 60000, // 60 seconds
+    await page.goto(process.env.SCREENSHOT_URL || 'https://www.wunderground.com/weather/us/vt/dorset', {
+      timeout: 60000, // 60 seconds
+    });
     await page.screenshot({
       path: '/tmp/screenshot.png',
     });
