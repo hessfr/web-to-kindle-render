@@ -11,13 +11,21 @@ express()
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', async (req, res) => {
-    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1600,1200'] });
     const page = await browser.newPage();
-    await page.setViewport({ width: 600, height: 800 });
-    await page.goto(process.env.SCREENSHOT_URL || 'https://www.wunderground.com/weather/us/vt/dorset', {
-      timeout: 60000, // 60 seconds
+    //await page.setViewport({ width: 824, height: 1200 });
+    await page.setViewport({ width: 1600, height: 1200 });
+ 
+    await page.goto(process.env.SCREENSHOT_URL || 'https://www.meteoschweiz.admin.ch/lokalprognose/zuerich/8001.html#forecast-tab=detail-view', {
+      timeout: 120000, // 2 minutes
     });
-    await page.screenshot({
+
+    await page.waitForTimeout(5000);
+
+    // const element = await page.waitForSelector('mch-local-forecast-page');
+    const element = await page.waitForSelector('mch-local-forecast-page >>> .local-forecast-detail-view__container');
+
+    await element.screenshot({
       path: '/tmp/screenshot.png',
     });
 
