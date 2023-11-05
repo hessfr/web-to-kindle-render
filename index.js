@@ -11,11 +11,18 @@ express()
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', async (req, res) => {
-    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1600,1200'] });
+
+    console.log("Starting Browser");	  
+    const browser = await puppeteer.launch({
+	    headless: 'new',
+	    executablePath: '/usr/bin/chromium-browser',
+	    args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1600,1200'] });
     const page = await browser.newPage();
     //await page.setViewport({ width: 824, height: 1200 });
     await page.setViewport({ width: 1600, height: 1200 });
  
+    console.log("Browser started");
+
     await page.goto(process.env.SCREENSHOT_URL || 'https://www.meteoschweiz.admin.ch/lokalprognose/zuerich/8001.html#forecast-tab=detail-view', {
       timeout: 120000, // 2 minutes
     });
@@ -32,6 +39,7 @@ express()
     await browser.close();
 
     await convert('/tmp/screenshot.png');
+
     screenshot = fs.readFileSync('/tmp/screenshot.png');
 
     res.writeHead(200, {
@@ -45,7 +53,7 @@ express()
 
 function convert(filename) {
   return new Promise((resolve, reject) => {
-    const args = [filename, '-gravity', 'center', '-extent', '600x800', '-colorspace', 'gray', '-depth', '8', filename];
+    const args = [filename, '-gravity', 'center', '-extent', '1600x800', '-colorspace', 'gray', '-depth', '8', filename];
     execFile('convert', args, (error, stdout, stderr) => {
       if (error) {
         console.error({ error, stdout, stderr });
